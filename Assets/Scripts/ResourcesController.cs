@@ -9,17 +9,21 @@ public class ResourceInfo
 {
     public string name;
     public GameObject triggerObject;
-    // public ResourceData resourceData; // Удалено
+
     public InventoryItemInfo inventoryItemInfo;
     public Text amountText; // Просто объявление поля для UI
-    public int amount; // Добавлено поле для хранения количества
+    public string globalVariableName; // например "wood_amount"
+
+
 }
 
 public class ResourcesController : MonoBehaviour
 {
+    public GlobalController controller;
     public ResourceLevel resLev;
     public List<ResourceInfo> resources;
     public AddingItems inventoryManager;
+    public string resourceId; // Идентификатор ресурса, если нужен
 
     void Start()
     {
@@ -40,49 +44,25 @@ public class ResourcesController : MonoBehaviour
         }
        
     }
-
-    // Метод для увеличения количества ресурса и добавления в инвентарь
-    public void CollectResource(string resourceName, int value = 1)
+    public void CollectResource(string resourceName, int value)
     {
+        // Добавляем к глобальной переменной
+        GlobalVariableAccessor.AddGlobalValue(resourceName, value);
+
+        // Обновляем UI
+        int newAmount = GlobalVariableAccessor.GetGlobalValue(resourceName);
         var res = resources.Find(r => r.name == resourceName);
-        if (res != null)
+        if (res != null && res.amountText != null)
         {
-            res.amount += value; // Сохраняем количество в поле класса
-            UpdateResourceText(res);
-
-            if (res.inventoryItemInfo != null && inventoryManager != null)
-            {
-                inventoryManager.AddItemToInventory(res.inventoryItemInfo);
-            }
+            res.amountText.text = newAmount.ToString();
         }
     }
 
-    void UpdateResourceText(ResourceInfo res)
-    {
-        // Проверяем, что resLev не null
-       
-        // Обновляем текст только если amountText назначен
-        if (res.amountText != null)
-        {
-            res.amountText.text = $"{res.amount}";
-            Debug.Log($"Обновлён текст для {res.name}: {res.amountText.text}");
-        }
-        else
-        {
-            Debug.LogWarning($"amountText не назначен для ресурса: {res.name}");
-        }
-    }
 
-    void Update()
-    {
-        // Синхронизируем значения amount с resLev.totalAmount
-      
-            foreach (var res in resources)
-            {
-                UpdateResourceText(res);
-            }
-        
-    }
+
+
+
+
 }
 
 
