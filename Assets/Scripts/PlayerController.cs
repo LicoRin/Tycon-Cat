@@ -1,55 +1,97 @@
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.EventSystems; // <-- для проверки UI кликов
 
+[RequireComponent(typeof(NavMeshAgent))]
 public class PlayerController : MonoBehaviour
 {
-    public float playerPos;
-    public float moveSpeed = 5f;
-    private Vector3 targetPos;
-    private bool isMoving = false;
-    private Animator animator;
+    [Header("References")]
+    [SerializeField] private Animator animator;
+    [SerializeField] private Camera mainCamera;
 
-    void Start()
+    private NavMeshAgent agent;
+    private Vector2 moveDir;
+
+    void Awake()
     {
-        targetPos = transform.position;
-        animator = GetComponent<Animator>();
+        agent = GetComponent<NavMeshAgent>();
+
+        // Настройка агента для 2D
+        agent.updateRotation = false;
+        agent.updateUpAxis = false;
+
+        if (animator == null)
+            animator = GetComponent<Animator>();
+
+        if (mainCamera == null)
+            mainCamera = Camera.main;
     }
 
     void Update()
     {
-        Vector3 direction = Vector3.zero;
+        HandleClickToMove();
+        UpdateMovement();
+        UpdateAnimation();
+    }
 
+    /// <summary>
+    /// Обработка клика мыши и установка точки назначения
+    /// </summary>
+    void HandleClickToMove()
+    {
         if (Input.GetMouseButtonDown(0))
         {
-            targetPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            targetPos.z = transform.position.z;
-            isMoving = true;
-        }
+            // Если клик по UI, игнорируем
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
 
-        if (isMoving && transform.position != targetPos)
-        {
-            direction = (targetPos - transform.position).normalized;
-            transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
-        }
-        else
-        {
-            isMoving = false;
-        }
+            Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            mouseWorldPos.z = 0f;
 
-        // Передаем параметры движения в аниматор
-        if (animator != null)
-        {
-            animator.SetFloat("MoveX", direction.x);
-            animator.SetFloat("MoveY", direction.y);
-            animator.SetBool("IsMoving", isMoving);
+            // Raycast2D под курсор
+            RaycastHit2D hit = Physics2D.Raycast(mouseWorldPos, Vector2.zero);
+            if (hit.collider != null)
+            {
+                agent.SetDestination(hit.point);
+            }
+            else
+            {
+                agent.SetDestination(mouseWorldPos);
+            }
         }
     }
 
-    public void OnDrawGizmos()
+    /// <summary>
+    /// Обновляем направление движения
+    /// </summary>
+    void UpdateMovement()
     {
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(transform.position, targetPos);
+        if (agent.hasPath)
+        {
+            Vector2 desiredVel = agent.desiredVelocity.normalized;
 
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(targetPos, 0.2f);
+            // Ограничиваем движение по 4 направлениям
+            if (Mathf.Abs(desiredVel.x) > Mathf.Abs(desiredVel.y))
+                moveDir = new Vector2(Mathf.Sign(desiredVel.x), 0f);
+            else
+                moveDir = new Vector2(0f, Mathf.Sign(desiredVel.y));
+        }
+        else
+        {
+            moveDir = Vector2.zero;
+        }
+    }
+
+    /// <summary>
+    /// Обновление анимации движения
+    /// </summary>
+    void UpdateAnimation()
+    {
+        if (animator != null)
+        {
+            animator.SetFloat("MoveX", moveDir.x);
+            animator.SetFloat("MoveY", moveDir.y);
+            animator.SetBool("IsMoving", moveDir.sqrMagnitude > 0.01f);
+        }
     }
 }

@@ -1,4 +1,4 @@
-using UnityEngine;
+п»їusing UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
@@ -6,10 +6,10 @@ using UnityEngine.UI;
 [System.Serializable]
 public class LevelInfo
 {
-    public int level;                // Уровень ресурса
-    public int amountPerCollect;     // Сколько предметов даёт за сбор
-    public float collectTime;        // Время сбора (сек)
-    public float recoveryTime;       // Время восстановления (сек)
+    public int level;                // РЈСЂРѕРІРµРЅСЊ СЂРµСЃСѓСЂСЃР°
+    public int amountPerCollect;     // РЎРєРѕР»СЊРєРѕ РїСЂРµРґРјРµС‚РѕРІ РґР°С‘С‚ Р·Р° СЃР±РѕСЂ
+    public float collectTime;        // Р’СЂРµРјСЏ СЃР±РѕСЂР° (СЃРµРє)
+    public float recoveryTime;       // Р’СЂРµРјСЏ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ (СЃРµРє)
 }
 
 public class ResourceLevel : MonoBehaviour
@@ -17,87 +17,126 @@ public class ResourceLevel : MonoBehaviour
     [Header("Level Settings")]
     public List<LevelInfo> levels = new List<LevelInfo>();
     public int currentLevel = 0;
+    public string resourceName; // РРјСЏ СЂРµСЃСѓСЂСЃР° РґР»СЏ РѕС‚Р»Р°РґРєРё
 
     [Header("Resource Settings")]
     public InventoryItemInfo inventoryItemInfo;  // ScriptableObject
-    public Text amountText;                      // UI-текст для отображения количества
+    public Text amountText;                      // UI-С‚РµРєСЃС‚ РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР°
 
-    private bool isCollecting = false;
-    private bool isRecovering = false;
+    [Header("Animation Settings")]
+    public Animator animator; // Р›РѕРєР°Р»СЊРЅС‹Р№ Animator РґР»СЏ РѕР±СЉРµРєС‚Р°
 
-    // Получить информацию о текущем уровне
-    public LevelInfo GetCurrentLevelInfo()
+    private bool isPlayerInside = false; // РРіСЂРѕРє РІ С‚СЂРёРіРіРµСЂРµ
+    private bool isRecovering = false;   // Р РµСЃСѓСЂСЃ РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ
+    private float collectProgress = 0f;  // РџСЂРѕРіСЂРµСЃСЃ СЃР±РѕСЂР° (СЃРµРє)
+
+    private LevelInfo CurrentInfo => GetCurrentLevelInfo();
+
+    private void Start()
+    {
+        // РџСЂРё СЃС‚Р°СЂС‚Рµ СЃС‚Р°РІРёРј Idle
+        SetAnimState(true, false, false);
+
+        // Р СЃСЂР°Р·Сѓ РѕР±РЅРѕРІР»СЏРµРј UI
+        if (amountText != null && inventoryItemInfo != null)
+        {
+            amountText.text = inventoryItemInfo.amount.ToString();
+        }
+    }
+
+    private void Update()
+    {
+        if (isPlayerInside && !isRecovering && CurrentInfo != null)
+        {
+            // РџСЂРѕРґРІРёРіР°РµРј РїСЂРѕРіСЂРµСЃСЃ СЃР±РѕСЂР°
+            collectProgress += Time.deltaTime;
+
+            // Р’РєР»СЋС‡Р°РµРј Р°РЅРёРјР°С†РёСЋ СЃР±РѕСЂР°
+            SetAnimState(false, true, false);
+
+            // РџСЂРѕРІРµСЂСЏРµРј Р·Р°РІРµСЂС€РµРЅРёРµ СЃР±РѕСЂР°
+            if (collectProgress >= CurrentInfo.collectTime)
+            {
+                CompleteCollection();
+            }
+        }
+        else if (!isRecovering)
+        {
+            // РРіСЂРѕРє РЅРµ СЃРѕР±РёСЂР°РµС‚ в†’ Idle
+            SetAnimState(true, false, false);
+        }
+    }
+
+    private void CompleteCollection()
+    {
+        collectProgress = 0f; // РЎР±СЂР°СЃС‹РІР°РµРј РїСЂРѕРіСЂРµСЃСЃ РґР»СЏ СЃР»РµРґСѓСЋС‰РµРіРѕ СЃР±РѕСЂР°
+
+        // вњ… РЈРІРµР»РёС‡РёРІР°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ РІ ScriptableObject
+        inventoryItemInfo.Initialize(
+            inventoryItemInfo.title,
+            inventoryItemInfo.description,
+            inventoryItemInfo.indentificator,
+            inventoryItemInfo.spriteIcon,
+            true,
+            inventoryItemInfo.amount + CurrentInfo.amountPerCollect
+        );
+
+        Debug.Log($"{inventoryItemInfo.title} С‚РµРїРµСЂСЊ: {inventoryItemInfo.amount}");
+
+        // вњ… РћР±РЅРѕРІР»СЏРµРј UI
+        if (amountText != null)
+            amountText.text = inventoryItemInfo.amount.ToString();
+
+        // РџРµСЂРµС…РѕРґ Рє РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЋ
+        StartCoroutine(StartRecovery(CurrentInfo.recoveryTime));
+    }
+
+    private IEnumerator StartRecovery(float recoveryTime)
+    {
+        isRecovering = true;
+        collectProgress = 0f; // РЎР±СЂРѕСЃ РїСЂРѕРіСЂРµСЃСЃР°, С‡С‚РѕР±С‹ РЅР°С‡Р°С‚СЊ Р·Р°РЅРѕРІРѕ
+
+        // РђРЅРёРјР°С†РёСЏ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ
+        SetAnimState(false, false, true);
+
+        yield return new WaitForSeconds(recoveryTime);
+
+        // Р’РѕР·РІСЂР°С‚ РІ Idle
+        SetAnimState(true, false, false);
+
+        isRecovering = false;
+    }
+
+    private void SetAnimState(bool idle, bool cutting, bool recovery)
+    {
+        if (animator == null) return;
+
+        animator.SetBool("Idle", idle);
+        animator.SetBool("isCutting", cutting);
+        animator.SetBool("isRecovery", recovery);
+    }
+
+    private LevelInfo GetCurrentLevelInfo()
     {
         if (levels.Count == 0) return null;
         return levels[Mathf.Clamp(currentLevel, 0, levels.Count - 1)];
-    }
-
-    public void UpgradeLevel()
-    {
-        if (currentLevel < levels.Count - 1)
-            currentLevel++;
-    }
-
-    public void ResetLevel()
-    {
-        currentLevel = 0;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            Debug.Log($"Игрок вошёл в триггер ресурса: {gameObject.name}");
-            if (!isCollecting && !isRecovering)
-            {
-                StartCoroutine(StartCollecting());
-            }
+            Debug.Log($"РРіСЂРѕРє РІРѕС€С‘Р» РІ С‚СЂРёРіРіРµСЂ СЂРµСЃСѓСЂСЃР°: {gameObject.name}");
+            isPlayerInside = true;
         }
-    }
-
-    private IEnumerator StartCollecting()
-    {
-        isCollecting = true;
-        LevelInfo info = GetCurrentLevelInfo();
-        if (info != null)
-        {
-            // Имитируем время сбора
-            yield return new WaitForSeconds(info.collectTime);
-
-            // ? Увеличиваем количество в ScriptableObject
-            inventoryItemInfo.Initialize(
-                inventoryItemInfo.title,
-                inventoryItemInfo.description,
-                inventoryItemInfo.indentificator,
-                inventoryItemInfo.spriteIcon,
-                true,
-                inventoryItemInfo.amount + info.amountPerCollect
-            );
-
-            Debug.Log($"{inventoryItemInfo.title} теперь: {inventoryItemInfo.amount}");
-
-            // ? Обновляем UI
-            if (amountText != null)
-                amountText.text = inventoryItemInfo.amount.ToString();
-
-            // После сбора запускаем восстановление
-            StartCoroutine(StartRecovery(info.recoveryTime));
-        }
-        isCollecting = false;
-    }
-
-    private IEnumerator StartRecovery(float recoveryTime)
-    {
-        isRecovering = true;
-        yield return new WaitForSeconds(recoveryTime);
-        isRecovering = false;
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            Debug.Log("Игрок вышел из триггера ресурса");
+            Debug.Log("РРіСЂРѕРє РІС‹С€РµР» РёР· С‚СЂРёРіРіРµСЂР° СЂРµСЃСѓСЂСЃР°");
+            isPlayerInside = false;
         }
     }
 }
