@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 [System.Serializable]
 public class LevelInfo
@@ -13,14 +14,16 @@ public class LevelInfo
 
 public class ResourceLevel : MonoBehaviour
 {
+    [Header("Level Settings")]
     public List<LevelInfo> levels = new List<LevelInfo>();
     public int currentLevel = 0;
+
+    [Header("Resource Settings")]
+    public InventoryItemInfo inventoryItemInfo;  // ScriptableObject
+    public Text amountText;                      // UI-текст для отображения количества
+
     private bool isCollecting = false;
     private bool isRecovering = false;
-     
-    public ResourcesController res; // Ссылка на контроллер ресурсов
-
-
 
     // Получить информацию о текущем уровне
     public LevelInfo GetCurrentLevelInfo()
@@ -50,10 +53,6 @@ public class ResourceLevel : MonoBehaviour
                 StartCoroutine(StartCollecting());
             }
         }
-        else
-        {
-            Debug.Log($"В триггер ресурса {gameObject.name} вошёл объект с тегом: {collision.tag}");
-        }
     }
 
     private IEnumerator StartCollecting()
@@ -62,11 +61,24 @@ public class ResourceLevel : MonoBehaviour
         LevelInfo info = GetCurrentLevelInfo();
         if (info != null)
         {
+            // Имитируем время сбора
             yield return new WaitForSeconds(info.collectTime);
-            res.CollectResource(gameObject.name, info.amountPerCollect);
-           
 
-            // Удалено: передача количества в ResourceData
+            // ? Увеличиваем количество в ScriptableObject
+            inventoryItemInfo.Initialize(
+                inventoryItemInfo.title,
+                inventoryItemInfo.description,
+                inventoryItemInfo.indentificator,
+                inventoryItemInfo.spriteIcon,
+                true,
+                inventoryItemInfo.amount + info.amountPerCollect
+            );
+
+            Debug.Log($"{inventoryItemInfo.title} теперь: {inventoryItemInfo.amount}");
+
+            // ? Обновляем UI
+            if (amountText != null)
+                amountText.text = inventoryItemInfo.amount.ToString();
 
             // После сбора запускаем восстановление
             StartCoroutine(StartRecovery(info.recoveryTime));
