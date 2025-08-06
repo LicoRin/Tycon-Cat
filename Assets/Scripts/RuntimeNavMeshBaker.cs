@@ -6,7 +6,7 @@ using NavMeshPlus.Components;
 [RequireComponent(typeof(NavMeshSurface))]
 public class RuntimeNavMeshBaker : MonoBehaviour
 {
-    private NavMeshSurface surface;
+    public NavMeshSurface surface;
 
     public void BakeRuntime()
     {
