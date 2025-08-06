@@ -18,7 +18,7 @@ public class GridBuildingSystem : MonoBehaviour
     [SerializeField] private TileBase redTile;
     public static GridBuildingSystem current;
 
-
+    public GameObject buildingTilemap;
     public GridLayout gridLayout;
     public Tilemap MainTilemap;
     public Tilemap TempTilemap;
@@ -79,13 +79,15 @@ public class GridBuildingSystem : MonoBehaviour
             if (temp.CanBePlaced())
             {
                temp.Place();
-               
+                buildingTilemap.SetActive(false);
+
             }
         }
         else if (Input.GetKeyDown(KeyCode.Escape) )
         {
             ClearArea();
-            Destroy(temp.gameObject);   
+            Destroy(temp.gameObject);
+            buildingTilemap.SetActive(false);
         }
     }
 
@@ -134,6 +136,7 @@ public class GridBuildingSystem : MonoBehaviour
     {
         temp = Instantiate(building, Vector3.zero, Quaternion.identity).GetComponent<Building>();
         FollowBuilding();
+        buildingTilemap.SetActive(true);
     }
 
     private void ClearArea()
