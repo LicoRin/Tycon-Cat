@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 public class GridBuildingSystem : MonoBehaviour
 {
 
-
+    public RuntimeNavMeshBaker navMeshBaker;
     [Header("Tile Assets")]
 
     [SerializeField] private TileBase whiteTile;
@@ -80,6 +80,7 @@ public class GridBuildingSystem : MonoBehaviour
             {
                temp.Place();
                 buildingTilemap.SetActive(false);
+                navMeshBaker.surface.BuildNavMesh();
 
             }
         }
