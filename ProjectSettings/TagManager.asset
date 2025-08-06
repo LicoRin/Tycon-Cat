@@ -49,6 +49,12 @@ TagManager:
   - name: resources
     uniqueID: 2475271371
     locked: 0
+  - name: BackGround
+    uniqueID: 4169993507
+    locked: 0
+  - name: building
+    uniqueID: 3244373305
+    locked: 0
   - name: Character
     uniqueID: 2621856771
     locked: 0

@@ -8,7 +8,7 @@ public class RuntimeNavMeshBaker : MonoBehaviour
 {
     private NavMeshSurface surface;
 
-    void Update()
+    public void BakeRuntime()
     {
         surface = GetComponent<NavMeshSurface>();
 
