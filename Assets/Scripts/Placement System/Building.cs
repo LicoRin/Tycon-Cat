@@ -1,14 +1,49 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Building : MonoBehaviour
 {
 
     public bool Placed { get; private set; }
     public BoundsInt area;
-    private void Start()
+    private Collider2D collider2d;
+
+    Vector3 offset;
+
+    void Awake()
     {
-        
+        collider2d = GetComponent<Collider2D>();
     }
+
+    void OnMouseDown()
+    {
+        offset = transform.position - MouseWorldPosition();
+    }
+
+    void OnMouseDrag()
+    {
+        // Конвертируем позицию мыши + смещение в клетку грида
+        Vector3 mousePos = MouseWorldPosition() + offset;
+        Vector3Int cellPos = GridBuildingSystem.current.gridLayout.LocalToCell(mousePos);
+
+        // Перемещаем объект в центр клетки
+        transform.position = GridBuildingSystem.current.gridLayout.CellToLocalInterpolated(
+            cellPos + new Vector3(.5f, .5f, 0f)
+        );
+
+        GridBuildingSystem.current.FollowBuilding();
+    }
+
+ 
+
+    Vector3 MouseWorldPosition()
+    {
+        var mouseScreenPos = Input.mousePosition;
+        mouseScreenPos.z = Camera.main.WorldToScreenPoint(transform.position).z;
+        return Camera.main.ScreenToWorldPoint(mouseScreenPos);
+    }
+
+
     #region Build Methods
     public bool CanBePlaced()
     {
@@ -34,6 +69,20 @@ public class Building : MonoBehaviour
 
     }
 
+
+    public void PlaceBuild()
+    {
+        GridBuildingSystem.current.SetBuild();
+        var navMeshBaker = FindObjectOfType<RuntimeNavMeshBaker>();
+        if (navMeshBaker != null)
+        {
+            navMeshBaker.BakeNavMesh();
+        }
+    }
+    public void CancelBuild()
+    {
+        GridBuildingSystem.current.UnsetBuild();
+    }
 
     #endregion
 }

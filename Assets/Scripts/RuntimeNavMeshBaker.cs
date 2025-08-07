@@ -1,18 +1,22 @@
 using UnityEngine;
-using UnityEngine.AI;
-using NavMeshPlus;
 using NavMeshPlus.Components;
 
 [RequireComponent(typeof(NavMeshSurface))]
 public class RuntimeNavMeshBaker : MonoBehaviour
 {
-    public NavMeshSurface surface;
+    private NavMeshSurface surface;
+    public static RuntimeNavMeshBaker current;
 
-    public void BakeRuntime()
+    void Awake()
     {
         surface = GetComponent<NavMeshSurface>();
+        current = this;
+    }
 
-        // Строим навмеш в рантайме
+    // Метод, который можно вызвать из UI кнопки
+    public void BakeNavMesh()
+    {
         surface.BuildNavMesh();
+        Debug.Log("NavMesh перестроен во время игры!");
     }
 }

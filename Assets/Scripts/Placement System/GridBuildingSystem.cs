@@ -1,16 +1,17 @@
-using UnityEngine;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System;
-using UnityEngine.Tilemaps;
 using Unity.Mathematics;
+using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Tilemaps;
 
 
 public class GridBuildingSystem : MonoBehaviour
 {
 
-    public RuntimeNavMeshBaker navMeshBaker;
+
     [Header("Tile Assets")]
 
     [SerializeField] private TileBase whiteTile;
@@ -52,7 +53,8 @@ public class GridBuildingSystem : MonoBehaviour
             return;
         }
 
-        if (Input.GetMouseButtonDown(0))
+
+        /*if (Input.GetMouseButtonDown(0))
         {
             if (EventSystem.current.IsPointerOverGameObject())
             {
@@ -73,24 +75,30 @@ public class GridBuildingSystem : MonoBehaviour
                     FollowBuilding();
                 }
             }
-        }
-        else if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (temp.CanBePlaced())
-            {
-               temp.Place();
-                buildingTilemap.SetActive(false);
-                navMeshBaker.surface.BuildNavMesh();
+        }*/
+       
+    }
 
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.Escape) )
+
+
+
+    public void SetBuild()
+    {
+        if (temp.CanBePlaced())
         {
-            ClearArea();
-            Destroy(temp.gameObject);
+            temp.Place();
             buildingTilemap.SetActive(false);
+
+
         }
     }
+    public void UnsetBuild()
+    {
+        ClearArea();
+        Destroy(temp.gameObject);
+        buildingTilemap.SetActive(false);
+    }
+
 
     #endregion
 
@@ -133,12 +141,31 @@ public class GridBuildingSystem : MonoBehaviour
 
     #region Building Placement
 
-    public void InitializeWithBuilding(GameObject building)
-    {
-        temp = Instantiate(building, Vector3.zero, Quaternion.identity).GetComponent<Building>();
-        FollowBuilding();
-        buildingTilemap.SetActive(true);
-    }
+    public void InitializeWithBuilding(GameObject buildingPrefab)
+{
+    // Берем позицию мыши
+    Vector3 mousePosition = Input.mousePosition;
+    mousePosition.z = 10f; // расстояние до камеры
+    Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
+
+        // Выравниваем по центру клетки
+        Vector3Int cellPosition = gridLayout.WorldToCell(worldPosition);
+        Vector3 snappedPosition = gridLayout.CellToWorld(cellPosition)
+                                + 0.5f * gridLayout.cellSize;
+
+
+        // Спавним объект уже в центре клетки
+        temp = Instantiate(buildingPrefab, snappedPosition, Quaternion.identity)
+                 .GetComponent<Building>();
+
+    // Устанавливаем область в ту же клетку
+    temp.area.position = cellPosition;
+
+    FollowBuilding();
+    buildingTilemap.SetActive(true);
+}
+
+
 
     private void ClearArea()
     {
@@ -149,7 +176,7 @@ public class GridBuildingSystem : MonoBehaviour
 
     }
 
-    private void  FollowBuilding()
+    public void  FollowBuilding()
     {
         ClearArea();
         temp.area.position = gridLayout.WorldToCell(temp.gameObject.transform.position);
