@@ -79,13 +79,21 @@ public class Building : MonoBehaviour
 
     public void PlaceBuild()
     {
-        GridBuildingSystem.current.SetBuild();
-        
-        var navMeshBaker = FindObjectOfType<RuntimeNavMeshBaker>();
-        if (navMeshBaker != null)
+       if (!CanBePlaced())
         {
-            navMeshBaker.BakeNavMesh();
+            Debug.LogError("Cannot place building here!");
+            return;
+        }else
+        {
+            GridBuildingSystem.current.SetBuild();
+
+            var navMeshBaker = FindObjectOfType<RuntimeNavMeshBaker>();
+            if (navMeshBaker != null)
+            {
+                navMeshBaker.BakeNavMesh();
+            }
         }
+       
 
     }
     public void SetOffButtons()
