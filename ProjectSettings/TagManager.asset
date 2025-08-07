@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 3
   tags:
   - UI
+  - Resource
+  - NotWalkable
   layers:
   - Default
   - TransparentFX

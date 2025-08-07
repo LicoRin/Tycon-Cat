@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.EventSystems; // <-- для проверки UI кликов
@@ -50,49 +51,83 @@ public class PlayerController : MonoBehaviour
             mouseDownPos = Input.mousePosition;
         }
 
-        if (Input.GetMouseButtonUp(0) )
+        if (Input.GetMouseButtonUp(0) && mousePressed)
         {
-            if (mousePressed)
+            float distance = Vector2.Distance(mouseDownPos, Input.mousePosition);
+
+            if (distance < CameraDrag.current.dragThreshold && !GridBuildingSystem.current.isBuildingMode)
             {
-                float distance = Vector2.Distance(mouseDownPos, Input.mousePosition);
+                Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+                mouseWorldPos.z = 0f;
 
-                // Если мышь почти не двигалась — это клик, а не drag
-                if (distance < CameraDrag.current.dragThreshold && !GridBuildingSystem.current.isBuildingMode)
+                RaycastHit2D hit = Physics2D.Raycast(mouseWorldPos, Vector2.zero);
+                if (hit.collider != null)
                 {
-                    Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-                    mouseWorldPos.z = 0f;
-
-                    RaycastHit2D hit = Physics2D.Raycast(mouseWorldPos, Vector2.zero);
-                    if (hit.collider != null)
+                    // Проверка на UI (включая родителей)
+                    Transform current = hit.collider.transform;
+                    while (current != null)
                     {
-                        // Проверка на тег UI у объекта и его родителей
-                        Transform current = hit.collider.transform;
-                        while (current != null)
-                        {
-                            if (current.CompareTag("UI"))
-                            {
-                                return; // Не перемещаемся
-                            }
-                            current = current.parent;
-                        }
-                    
-                       
+                        if (current.CompareTag("UI"))
+                            return;
+                        current = current.parent;
                     }
-                    else
+
+                    // Проверка на Resource
+                    current = hit.collider.transform;
+                    bool isResource = false;
+
+                    while (current != null)
                     {
-                        agent.SetDestination(mouseWorldPos);
+                        if (current.CompareTag("Resource"))
+                        {
+                            isResource = true;
+                            break;
+                        }
+                        current = current.parent;
+                    }
+
+                    Vector3 targetPos = hit.point;
+
+                    targetPos.z = 0f;
+
+                    if (isResource)
+                    {
+                        targetPos = hit.collider.transform.position;
+                        targetPos.z = 0f;
+
+                        NavMeshHit navHit;
+                        if (NavMesh.Raycast(agent.transform.position, targetPos, out navHit, NavMesh.AllAreas))
+                        {
+                            agent.SetDestination(navHit.position);
+                            Debug.DrawLine(agent.transform.position, navHit.position, Color.red, 1f);
+                            Debug.Log("NavMesh: путь прерван — идём до границы объекта.");
+                        }
+                        else
+                        {
+                            agent.SetDestination(targetPos);
+                            Debug.DrawLine(agent.transform.position, targetPos, Color.green, 1f);
+                            Debug.Log("NavMesh: путь свободен — идём к ресурсу.");
+                        }
+
+                        mousePressed = false;
+                        return;
                     }
                 }
+
+                // Клик не по ресурсу — просто идём
+                agent.SetDestination(mouseWorldPos);
+                Debug.DrawLine(agent.transform.position, mouseWorldPos, Color.yellow, 1f);
+                Debug.Log("NavMesh: Просто идём.");
             }
 
             mousePressed = false;
         }
-    
+    }
 
-}  /// <summary>
-        /// Обновляем направление движения
-        /// </summary>
-        void UpdateMovement()
+
+
+
+    void UpdateMovement()
     {
         if (agent.hasPath)
         {
