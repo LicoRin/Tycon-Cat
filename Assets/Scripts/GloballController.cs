@@ -48,4 +48,13 @@ public class GloballController : MonoBehaviour
         GloballController.current.shopPanel.SetActive(true);
         GloballController.current.shopButton.SetActive(false);
     }
+
+    public void CloseNotEnoughPanel()
+    {
+        ShopManager.current.notEnoughResourcesPanel.SetActive(false);
+        ShopManager.current.exitShopButton.SetActive(true);
+
+
+  
+    }
 }

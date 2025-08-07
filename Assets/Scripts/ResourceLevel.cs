@@ -34,6 +34,8 @@ public class ResourceLevel : MonoBehaviour
 
     private void Start()
     {
+
+        
         // При старте ставим Idle
         SetAnimState(true, false, false);
 

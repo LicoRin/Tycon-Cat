@@ -16,6 +16,10 @@ public class InventoryItemInfo : ScriptableObject
     public Sprite spriteIcon => _spriteIcon; // свойство для получения изображения предмета
     public bool isOnInventory => _isOnInventory;
     public int amount => _amount;
+    public void DecreaseAmount(int value)
+    {
+        _amount = Mathf.Max(0, _amount - value); // чтобы не ушло в минус
+    }
 
     public void Initialize(string title, string description, string identificator, Sprite sprite, bool isOnInventory, int amount)
     {
