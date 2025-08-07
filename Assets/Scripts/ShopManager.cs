@@ -16,8 +16,7 @@ public class houseManger
 public class ShopManager : MonoBehaviour
 {
     public static ShopManager current;
-    public GameObject shopPanel;
-    public GameObject shopButton;
+    
     public bool playerMoved = false;
     
 
@@ -45,8 +44,8 @@ public class ShopManager : MonoBehaviour
 
     void BuyHouse(GameObject housePrefab)
     {
-        shopPanel.SetActive(false);
-        shopButton.SetActive(true);
+        GloballController.current.shopPanel.SetActive(false);
+        GloballController.current.shopButton.SetActive(false);
         GridBuildingSystem.current.InitializeWithBuilding(housePrefab);
 
 
@@ -56,16 +55,6 @@ public class ShopManager : MonoBehaviour
 
 
 
-    public void CloseShopPanel()
-    {
-        shopPanel.SetActive(false);
-        shopButton.SetActive(true);
-    }
-
-    public void OpenShopPanel()
-    {
-        shopPanel.SetActive(true);
-        shopButton.SetActive(false);
-    }
+    
 }
 

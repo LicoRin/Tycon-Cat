@@ -107,16 +107,20 @@ public class Building : MonoBehaviour
         {
             placeCancelButtons.SetActive(false);
             GridBuildingSystem.current.isBuildingMode = false;
+            GloballController.current.shopButton.SetActive(true);
         }
         else
         {
             placeCancelButtons.SetActive(true);
+            GloballController.current.shopButton.SetActive(true);
             GridBuildingSystem.current.isBuildingMode = true;
         }
     }
     public void CancelBuild()
     {
         GridBuildingSystem.current.UnsetBuild();
+        GloballController.current.shopButton.SetActive(true);
+        GridBuildingSystem.current.isBuildingMode = false;
 
     }
 

@@ -50,14 +50,14 @@ public class PlayerController : MonoBehaviour
             mouseDownPos = Input.mousePosition;
         }
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) )
         {
             if (mousePressed)
             {
                 float distance = Vector2.Distance(mouseDownPos, Input.mousePosition);
 
                 // Если мышь почти не двигалась — это клик, а не drag
-                if (distance < CameraDrag.current.dragThreshold)
+                if (distance < CameraDrag.current.dragThreshold && !GridBuildingSystem.current.isBuildingMode)
                 {
                     Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
                     mouseWorldPos.z = 0f;
@@ -65,7 +65,18 @@ public class PlayerController : MonoBehaviour
                     RaycastHit2D hit = Physics2D.Raycast(mouseWorldPos, Vector2.zero);
                     if (hit.collider != null)
                     {
-                        agent.SetDestination(hit.point);
+                        // Проверка на тег UI у объекта и его родителей
+                        Transform current = hit.collider.transform;
+                        while (current != null)
+                        {
+                            if (current.CompareTag("UI"))
+                            {
+                                return; // Не перемещаемся
+                            }
+                            current = current.parent;
+                        }
+                    
+                       
                     }
                     else
                     {

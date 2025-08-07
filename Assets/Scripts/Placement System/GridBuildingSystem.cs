@@ -31,7 +31,7 @@ public class GridBuildingSystem : MonoBehaviour
 
     private BoundsInt prevArea;
 
-    public bool isBuildingMode= false;
+    public bool isBuildingMode = false;
 
     #region Unity Methods
 

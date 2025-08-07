@@ -15,6 +15,6 @@ MonoBehaviour:
   _title: Wood
   _description: wood
   _indentificator: wood
-  _spriteIcon: {fileID: 1864594044337740870, guid: 2c4ecf99478c10b49be46d50ebd14852, type: 3}
-  _isOnInventory: 0
+  _spriteIcon: {fileID: 6134250156721728216, guid: 8ba5497edeafc6742848e0e9ba089d29, type: 3}
+  _isOnInventory: 1
   _amount: 0

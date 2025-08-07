@@ -3,37 +3,50 @@ using UnityEngine.Events;
 
 public class ClickHandler : MonoBehaviour
 {
-    public  UnityEvent _onClick;
+    public UnityEvent _onClick;
+
+    [Header("Button Sprites")]
+    public Sprite normalSprite;
+    public Sprite pressedSprite;
+
+    private SpriteRenderer spriteRenderer;
     private BoxCollider2D collider2d;
-    Vector3 offset;
     private MouseInput _mouseInput;
 
     [System.Obsolete]
     private void Awake()
     {
+        spriteRenderer = GetComponent<SpriteRenderer>();
         collider2d = GetComponent<BoxCollider2D>();
         _mouseInput = FindObjectOfType<MouseInput>();
         _mouseInput.Clicked += MouseOnClicked;
+
+        // Установим обычный спрайт по умолчанию
+        spriteRenderer.sprite = normalSprite;
     }
 
     private void MouseOnClicked()
     {
-
-        if(collider2d.bounds.Contains(_mouseInput.worldPosition))
+        if (collider2d.bounds.Contains(_mouseInput.worldPosition))
         {
             _onClick?.Invoke();
         }
-        
     }
 
-    void OnMouseDown()
+    private void OnMouseDown()
     {
+        spriteRenderer.sprite = pressedSprite;
         _onClick?.Invoke();
     }
-    Vector3 MouseWorldPosition()
+
+    private void OnMouseUp()
     {
-        var mouseScreenPos = Input.mousePosition;
-        mouseScreenPos.z = Camera.main.WorldToScreenPoint(transform.position).z;
-        return Camera.main.ScreenToWorldPoint(mouseScreenPos);
+        spriteRenderer.sprite = normalSprite;
+    }
+
+    private void OnMouseExit()
+    {
+        // Если мышка ушла с объекта до отпускания
+        spriteRenderer.sprite = normalSprite;
     }
 }
