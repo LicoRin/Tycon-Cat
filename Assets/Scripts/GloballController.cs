@@ -1,60 +1,78 @@
-using UnityEngine;
-using UnityEngine.Rendering.Universal;
+п»їusing UnityEngine;
 using UnityEngine.UI;
 
 public class GloballController : MonoBehaviour
 {
-
     public static GloballController current;
+
+    [Header("UI РџР°РЅРµР»Рё")]
     public GameObject shopPanel;
     public GameObject shopButton;
     public GameObject HomePanel;
 
-    public InventoryItemInfo inventoryItemInfo;  // ScriptableObject
-    public Text MoneyAmountText;                      // UI-текст для отображения количества
+    [Header("ScriptableObject СЂРµСЃСѓСЂСЃРѕРІ")]
+    public InventoryItemInfo WoodInfo;
+    public InventoryItemInfo StoneInfo;
+    public InventoryItemInfo MoneyInfo;
 
-    private void Update()
-    {
-        
-        // И сразу обновляем UI
-        if (MoneyAmountText != null && inventoryItemInfo != null)
-        {
-            MoneyAmountText.text = inventoryItemInfo.amount.ToString();
-        }
-    }
-    public void Awake()
+    [Header("UI РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ")]
+    public Text WoodAmountText;
+    public Text StoneAmountText;
+    public Text MoneyAmountText;
+
+    private void Awake()
     {
         current = this;
     }
+
+    private void Update()
+    {
+        UpdateResourceUI();
+    }
+
+    /// <summary>
+    /// вњ… РњРµС‚РѕРґ РґР»СЏ РѕР±РЅРѕРІР»РµРЅРёСЏ UI РєРѕР»РёС‡РµСЃС‚РІР° СЂРµСЃСѓСЂСЃРѕРІ
+    /// </summary>
+    public void UpdateResourceUI()
+    {
+        if (WoodAmountText != null && WoodInfo != null)
+            WoodAmountText.text = WoodInfo.amount.ToString();
+
+        if (StoneAmountText != null && StoneInfo != null)
+            StoneAmountText.text = StoneInfo.amount.ToString();
+
+        if (MoneyAmountText != null && MoneyInfo != null)
+            MoneyAmountText.text = MoneyInfo.amount.ToString();
+    }
+
+
     public void SetOnHomePanel()
     {
         HomePanel.SetActive(true);
-        GloballController.current.shopButton.SetActive(false);
+        shopButton.SetActive(false);
     }
+
     public void SetOffHomePanel()
     {
         HomePanel.SetActive(false);
-        GloballController.current.shopButton.SetActive(true);
+        shopButton.SetActive(true);
     }
 
     public void CloseShopPanel()
     {
-        GloballController.current.shopPanel.SetActive(false);
-        GloballController.current.shopButton.SetActive(true);
+        shopPanel.SetActive(false);
+        shopButton.SetActive(true);
     }
 
     public void OpenShopPanel()
     {
-        GloballController.current.shopPanel.SetActive(true);
-        GloballController.current.shopButton.SetActive(false);
+        shopPanel.SetActive(true);
+        shopButton.SetActive(false);
     }
 
     public void CloseNotEnoughPanel()
     {
         ShopManager.current.notEnoughResourcesPanel.SetActive(false);
         ShopManager.current.exitShopButton.SetActive(true);
-
-
-  
     }
 }

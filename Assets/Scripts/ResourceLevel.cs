@@ -1,15 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.UI;
-
+using UnityEngine.UI;   
 [System.Serializable]
 public class LevelInfo
 {
-    public int level;                // Уровень ресурса
-    public int amountPerCollect;     // Сколько предметов даёт за сбор
-    public float collectTime;        // Время сбора (сек)
-    public float recoveryTime;       // Время восстановления (сек)
+    public int level;
+    public int amountPerCollect;
+    public float collectTime;
+    public float recoveryTime;
 }
 
 public class ResourceLevel : MonoBehaviour
@@ -17,46 +16,42 @@ public class ResourceLevel : MonoBehaviour
     [Header("Level Settings")]
     public List<LevelInfo> levels = new List<LevelInfo>();
     public int currentLevel = 0;
-    public string resourceName; // Имя ресурса для отладки
+    public string resourceName;
 
-    [Header("Resource Settings")]
-    public InventoryItemInfo inventoryItemInfo;  // ScriptableObject
-    public Text amountText;                      // UI-текст для отображения количества
+    
+    public enum ResourceType { Wood, Stone, Money }
+    public ResourceType resourceType;
+
+    [Header("Resource References")]
+    
+    public InventoryItemInfo woodInfo;
+    public InventoryItemInfo stoneInfo;
+    public InventoryItemInfo moneyInfo;
 
     [Header("Animation Settings")]
-    public Animator animator; // Локальный Animator для объекта
+    public Animator animator;
 
-    private bool isPlayerInside = false; // Игрок в триггере
-    private bool isRecovering = false;   // Ресурс восстанавливается
-    private float collectProgress = 0f;  // Прогресс сбора (сек)
+    private bool isPlayerInside = false;
+    private bool isRecovering = false;
+    private float collectProgress = 0f;
 
     private LevelInfo CurrentInfo => GetCurrentLevelInfo();
 
     private void Start()
     {
-
-        
-        // При старте ставим Idle
         SetAnimState(true, false, false);
-
-        // И сразу обновляем UI
-        if (amountText != null && inventoryItemInfo != null)
-        {
-            amountText.text = inventoryItemInfo.amount.ToString();
-        }
     }
-
+    public void UpdateMesh()
+    {
+        RuntimeNavMeshBaker.current.BakeNavMesh();
+    }
     private void Update()
     {
         if (isPlayerInside && !isRecovering && CurrentInfo != null)
         {
-            // Продвигаем прогресс сбора
             collectProgress += Time.deltaTime;
-
-            // Включаем анимацию сбора
             SetAnimState(false, true, false);
 
-            // Проверяем завершение сбора
             if (collectProgress >= CurrentInfo.collectTime)
             {
                 CompleteCollection();
@@ -64,48 +59,75 @@ public class ResourceLevel : MonoBehaviour
         }
         else if (!isRecovering)
         {
-            // Игрок не собирает → Idle
             SetAnimState(true, false, false);
         }
     }
 
     private void CompleteCollection()
     {
-        collectProgress = 0f; // Сбрасываем прогресс для следующего сбора
+        collectProgress = 0f;
+        int amountToAdd = CurrentInfo.amountPerCollect;
 
-        // ✅ Увеличиваем количество в ScriptableObject
-        inventoryItemInfo.Initialize(
-            inventoryItemInfo.title,
-            inventoryItemInfo.description,
-            inventoryItemInfo.indentificator,
-            inventoryItemInfo.spriteIcon,
-            true,
-            inventoryItemInfo.amount + CurrentInfo.amountPerCollect
-        );
+        switch (resourceType)
+        {
+            case ResourceType.Wood:
+                if (woodInfo != null)
+                {
+                    woodInfo.Initialize(
+                        woodInfo.title,
+                        woodInfo.description,
+                        woodInfo.indentificator,
+                        woodInfo.spriteIcon,
+                        true,
+                        woodInfo.amount + amountToAdd
+                    );
+                }
+                break;
 
-        Debug.Log($"{inventoryItemInfo.title} теперь: {inventoryItemInfo.amount}");
+            case ResourceType.Stone:
+                if (stoneInfo != null)
+                {
+                    stoneInfo.Initialize(
+                        stoneInfo.title,
+                        stoneInfo.description,
+                        stoneInfo.indentificator,
+                        stoneInfo.spriteIcon,
+                        true,
+                        stoneInfo.amount + amountToAdd
+                    );
+                }
+                break;
 
-        // ✅ Обновляем UI
-        if (amountText != null)
-            amountText.text = inventoryItemInfo.amount.ToString();
+            case ResourceType.Money:
+                if (moneyInfo != null)
+                {
+                    moneyInfo.Initialize(
+                        moneyInfo.title,
+                        moneyInfo.description,
+                        moneyInfo.indentificator,
+                        moneyInfo.spriteIcon,
+                        true,
+                        moneyInfo.amount + amountToAdd
+                    );
+                }
+                break;
+        }
 
-        // Переход к восстановлению
+        GloballController.current?.UpdateResourceUI();
+
         StartCoroutine(StartRecovery(CurrentInfo.recoveryTime));
     }
+
 
     private IEnumerator StartRecovery(float recoveryTime)
     {
         isRecovering = true;
-        collectProgress = 0f; // Сброс прогресса, чтобы начать заново
-
-        // Анимация восстановления
+        collectProgress = 0f;
         SetAnimState(false, false, true);
 
         yield return new WaitForSeconds(recoveryTime);
 
-        // Возврат в Idle
         SetAnimState(true, false, false);
-
         isRecovering = false;
     }
 
@@ -128,7 +150,6 @@ public class ResourceLevel : MonoBehaviour
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            Debug.Log($"Игрок вошёл в триггер ресурса: {gameObject.name}");
             isPlayerInside = true;
         }
     }
@@ -137,7 +158,6 @@ public class ResourceLevel : MonoBehaviour
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            Debug.Log("Игрок вышел из триггера ресурса");
             isPlayerInside = false;
         }
     }
