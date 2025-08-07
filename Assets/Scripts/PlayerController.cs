@@ -8,9 +8,11 @@ public class PlayerController : MonoBehaviour
     [Header("References")]
     [SerializeField] private Animator animator;
     [SerializeField] private Camera mainCamera;
+    private Vector2 mouseDownPos;
 
     private NavMeshAgent agent;
     private Vector2 moveDir;
+    private bool mousePressed = false;
 
     void Awake()
     {
@@ -39,32 +41,47 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     void HandleClickToMove()
     {
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            return;
+
         if (Input.GetMouseButtonDown(0))
         {
-            // Если клик по UI, игнорируем
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
-                return;
-
-            Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            mouseWorldPos.z = 0f;
-
-            // Raycast2D под курсор
-            RaycastHit2D hit = Physics2D.Raycast(mouseWorldPos, Vector2.zero);
-            if (hit.collider != null)
-            {
-                agent.SetDestination(hit.point);
-            }
-            else
-            {
-                agent.SetDestination(mouseWorldPos);
-            }
+            mousePressed = true;
+            mouseDownPos = Input.mousePosition;
         }
-    }
 
-    /// <summary>
-    /// Обновляем направление движения
-    /// </summary>
-    void UpdateMovement()
+        if (Input.GetMouseButtonUp(0))
+        {
+            if (mousePressed)
+            {
+                float distance = Vector2.Distance(mouseDownPos, Input.mousePosition);
+
+                // Если мышь почти не двигалась — это клик, а не drag
+                if (distance < CameraDrag.current.dragThreshold)
+                {
+                    Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+                    mouseWorldPos.z = 0f;
+
+                    RaycastHit2D hit = Physics2D.Raycast(mouseWorldPos, Vector2.zero);
+                    if (hit.collider != null)
+                    {
+                        agent.SetDestination(hit.point);
+                    }
+                    else
+                    {
+                        agent.SetDestination(mouseWorldPos);
+                    }
+                }
+            }
+
+            mousePressed = false;
+        }
+    
+
+}  /// <summary>
+        /// Обновляем направление движения
+        /// </summary>
+        void UpdateMovement()
     {
         if (agent.hasPath)
         {

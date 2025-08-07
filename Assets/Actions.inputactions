@@ -39,11 +39,39 @@
                 {
                     "name": "",
                     "id": "0a06b3b9-8fee-479b-9561-7d5766a3b602",
-                    "path": "<Mouse>/leftButton",
+                    "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "MouseAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "CameraDrag",
+            "id": "66bcb09d-c0df-4509-ae37-e3ff1101446e",
+            "actions": [
+                {
+                    "name": "Drag",
+                    "type": "Button",
+                    "id": "367c0817-9d4e-4a08-a693-ac167329bd49",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "6a99680f-b334-4b65-9c85-54a5701d69a1",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "Hold",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Drag",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

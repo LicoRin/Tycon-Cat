@@ -4,8 +4,10 @@ using UnityEngine.UI;
 
 public class Building : MonoBehaviour
 {
+    
+    
     public GameObject placeCancelButtons;
-  
+    
     public bool Placed { get; private set; }
     public BoundsInt area;
     private Collider2D collider2d;
@@ -92,6 +94,8 @@ public class Building : MonoBehaviour
             {
                 navMeshBaker.BakeNavMesh();
             }
+
+            
         }
        
 
@@ -102,10 +106,12 @@ public class Building : MonoBehaviour
         if (Placed)
         {
             placeCancelButtons.SetActive(false);
+            GridBuildingSystem.current.isBuildingMode = false;
         }
         else
         {
             placeCancelButtons.SetActive(true);
+            GridBuildingSystem.current.isBuildingMode = true;
         }
     }
     public void CancelBuild()

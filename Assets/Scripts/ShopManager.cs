@@ -19,6 +19,7 @@ public class ShopManager : MonoBehaviour
     public GameObject shopPanel;
     public GameObject shopButton;
     public bool playerMoved = false;
+    
 
     public List<houseManger> houses = new List<houseManger>();
 
@@ -47,6 +48,7 @@ public class ShopManager : MonoBehaviour
         shopPanel.SetActive(false);
         shopButton.SetActive(true);
         GridBuildingSystem.current.InitializeWithBuilding(housePrefab);
+
 
     }
 

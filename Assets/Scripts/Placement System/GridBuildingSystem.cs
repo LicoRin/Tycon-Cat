@@ -31,6 +31,8 @@ public class GridBuildingSystem : MonoBehaviour
 
     private BoundsInt prevArea;
 
+    public bool isBuildingMode= false;
+
     #region Unity Methods
 
     private void Awake()
@@ -143,6 +145,7 @@ public class GridBuildingSystem : MonoBehaviour
 
     public void InitializeWithBuilding(GameObject buildingPrefab)
 {
+
     // Ѕерем позицию мыши
     Vector3 mousePosition = Input.mousePosition;
     mousePosition.z = 10f; // рассто€ние до камеры
@@ -178,6 +181,7 @@ public class GridBuildingSystem : MonoBehaviour
 
     public void  FollowBuilding()
     {
+        isBuildingMode = true;
         ClearArea();
         temp.area.position = gridLayout.WorldToCell(temp.gameObject.transform.position);
         BoundsInt buildingArea = temp.area;
