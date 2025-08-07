@@ -247,7 +247,7 @@ GameObject:
   - component: {fileID: 1698846711814362584}
   - component: {fileID: 2547360608615360775}
   - component: {fileID: 1472665897232569684}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: ButtonCancel
   m_TagString: UI
   m_Icon: {fileID: 0}
@@ -498,7 +498,7 @@ GameObject:
   - component: {fileID: 5560352297944689392}
   - component: {fileID: 1401454773811892046}
   - component: {fileID: 1645825380899475446}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: ButtonDone
   m_TagString: UI
   m_Icon: {fileID: 0}
