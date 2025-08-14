@@ -29,11 +29,11 @@ public class Building : MonoBehaviour
 
         if (!Placed)
         {
-            // Конвертируем позицию мыши + смещение в клетку грида
+           
             Vector3 mousePos = MouseWorldPosition() + offset;
             Vector3Int cellPos = GridBuildingSystem.current.gridLayout.LocalToCell(mousePos);
 
-            // Перемещаем объект в центр клетки
+           
             transform.position = GridBuildingSystem.current.gridLayout.CellToLocalInterpolated(
                 cellPos + new Vector3(.5f, .5f, 0f)
             );

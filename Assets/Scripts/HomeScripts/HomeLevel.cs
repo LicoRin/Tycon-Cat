@@ -19,22 +19,22 @@ public class HomeLevel : MonoBehaviour
     public int currentLevel = 0;
 
     [Header("Home Instance")]
-    public Transform homeParent; // Родитель для дома
+    public Transform homeParent; 
     private GameObject currentHomeInstance;
 
     private int previousLevel = -1;
 
     private void Start()
     {
-        UpdateHomeVisual(); // При запуске загружаем нужный префаб
+        UpdateHomeVisual(); 
     }
 
     private void Update()
     {
         if (currentLevel != previousLevel)
         {
-            previousLevel = currentLevel; // Сначала обновляем
-            UpdateHomeVisual();           // Потом визуально обновляем
+            previousLevel = currentLevel; 
+            UpdateHomeVisual();          
         }
     }
 
@@ -43,27 +43,27 @@ public class HomeLevel : MonoBehaviour
     {
         if (currentLevel < 0 || currentLevel >= levels.Count)
         {
-            Debug.LogWarning("Неверный уровень дома: " + currentLevel);
+            Debug.LogWarning("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ: " + currentLevel);
             return;
         }
 
-        // Удалить старый
+      
         if (currentHomeInstance != null)
         {
             Destroy(currentHomeInstance);
         }
 
-        // Создать новый
+       
         GameObject prefab = levels[currentLevel].homePrefab;
         currentHomeInstance = Instantiate(prefab, homeParent);
 
-        // Сбросить локальную позицию и поворот
+       
         currentHomeInstance.transform.localPosition = Vector3.zero;
         currentHomeInstance.transform.localRotation = Quaternion.identity;
 
         previousLevel = currentLevel;
 
-        // ?? Вызов перестройки NavMesh после смены уровня
+        
         UpdateArea();
     }
 

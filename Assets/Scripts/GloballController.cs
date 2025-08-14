@@ -30,9 +30,7 @@ public class GloballController : MonoBehaviour
         UpdateResourceUI();
     }
 
-    /// <summary>
-    /// ✅ Метод для обновления UI количества ресурсов
-    /// </summary>
+    
     public void UpdateResourceUI()
     {
         if (WoodAmountText != null && WoodInfo != null)

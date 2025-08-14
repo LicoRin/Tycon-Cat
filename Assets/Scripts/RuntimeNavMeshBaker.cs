@@ -13,10 +13,10 @@ public class RuntimeNavMeshBaker : MonoBehaviour
         current = this;
     }
 
-    // Метод, который можно вызвать из UI кнопки
+  
     public void BakeNavMesh()
     {
         surface.BuildNavMesh();
-        Debug.Log("NavMesh перестроен во время игры!");
+        Debug.Log("NavMesh пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ!");
     }
 }

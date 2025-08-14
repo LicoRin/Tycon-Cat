@@ -7,7 +7,7 @@ public class houseManger
 {
     public string houseName;
     public GameObject housePrefab;
-    public GameObject blockOverlay; // объект, который накрывает кнопку (в инспекторе)
+    public GameObject blockOverlay; 
     public Button houseButton;
 
     public Text HousePriceText;
@@ -24,7 +24,7 @@ public class houseManger
 
     public void UpdateUI()
     {
-        // Показываем сколько домов можно купить
+        
         if (HouseAmountText != null)
             HouseAmountText.text = amountOfHouse.ToString();
 
@@ -36,10 +36,10 @@ public class houseManger
 
         if (houseButton != null)
         {
-            // Кнопка активна, если лимит домов больше 0 (даже если ресурсов не хватает — кнопка не блокируется)
+            
             houseButton.interactable = amountOfHouse > 0;
 
-            // Показываем overlay, если лимит исчерпан (0)
+         
             if (blockOverlay != null)
                 blockOverlay.SetActive(amountOfHouse == 0);
 
@@ -57,7 +57,7 @@ public class ShopManager : MonoBehaviour
     public static ShopManager current;
 
     [Header("Панели страниц")]
-    public List<GameObject> pages = new List<GameObject>(); // ← твои 3 панели
+    public List<GameObject> pages = new List<GameObject>(); 
     private int currentPage = 0;
 
     [Header("Кнопки переключения")]
@@ -80,11 +80,10 @@ public class ShopManager : MonoBehaviour
 
     void Start()
     {
-        // Назначение кнопок переключения
         nextPageButton.onClick.AddListener(NextPage);
         prevPageButton.onClick.AddListener(PreviousPage);
 
-        // Назначение кнопок покупки
+      
         for (int i = 0; i < houses.Count; i++)
         {
             int index = i;
@@ -133,7 +132,7 @@ public class ShopManager : MonoBehaviour
 
         if (selectedHouse.amountOfHouse <= 0)
         {
-            // Уже нельзя покупать — лимит исчерпан
+            
             Debug.Log("Лимит домов исчерпан, купить нельзя.");
             return;
         }
@@ -153,8 +152,7 @@ public class ShopManager : MonoBehaviour
     void BuyHouse(houseManger house)
     {
         house.inventoryItemInfo.DecreaseAmount(house.housePrice);
-        house.amountOfHouse--; // уменьшаем лимит по доступным домам
-
+        house.amountOfHouse--; 
         GloballController.current.shopPanel.SetActive(false);
         GloballController.current.shopButton.SetActive(false);
 

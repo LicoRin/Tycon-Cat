@@ -9,45 +9,45 @@ public class HomePanel : MonoBehaviour
     public Text curerntPriceText;
 
     [Header("Upgrade Resource")]
-    public InventoryItemInfo ValueResource; // ScriptableObject с количеством
+    public InventoryItemInfo ValueResource;
 
     [Header("References")]
-    public HomeLevel homeLevel; // Ссылка на HomeLevel
+    public HomeLevel homeLevel;
 
     private void Start()
     {
-        UpdateUI(); // Обновить интерфейс при старте
+        UpdateUI();
     }
 
     public void UpgradeHome()
     {
         int level = homeLevel.currentLevel;
 
-        // Проверка: максимальный уровень?
+
         if (level >= homeLevel.levels.Count - 1)
         {
-            Debug.Log("Максимальный уровень достигнут");
+            Debug.Log("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
             return;
         }
 
         HomeLevelInfo nextLevelInfo = homeLevel.levels[level + 1];
         int price = nextLevelInfo.upgradePrice;
 
-        // Проверка, хватает ли ресурса
+
         if (ValueResource.amount >= price)
         {
-            // Уменьшаем ресурс
+
             DecreaseResource(ValueResource, price);
 
-            // Повышаем уровень
+
             homeLevel.currentLevel++;
 
-            // Обновляем визуал
+
             UpdateUI();
         }
         else
         {
-            Debug.Log("Недостаточно ресурсов для улучшения");
+            Debug.Log("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
         }
     }
 
@@ -56,7 +56,7 @@ public class HomePanel : MonoBehaviour
         var so = resource;
         var newAmount = Mathf.Max(0, so.amount - amount);
 
-        // Важно: так как ScriptableObject сериализован, нужно отразить изменения
+        
 #if UNITY_EDITOR
         UnityEditor.Undo.RecordObject(so, "Upgrade Resource Used");
         UnityEditor.EditorUtility.SetDirty(so);

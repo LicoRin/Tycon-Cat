@@ -12,7 +12,7 @@ public class CameraDrag : MonoBehaviour
     public bool isDragging;
     public static CameraDrag current { get; private set; }
 
-    [SerializeField] public float dragThreshold = 5f; // Порог для начала drag (в пикселях)
+    [SerializeField] public float dragThreshold = 5f; 
 
     private void Awake()
     {
@@ -61,7 +61,7 @@ public class CameraDrag : MonoBehaviour
     private Vector3 GetMouseWorldPosition2D()
     {
         Vector3 mouseScreenPos = Mouse.current.position.ReadValue();
-        mouseScreenPos.z = 0f; // Z = 0 для 2D камеры
+        mouseScreenPos.z = 0f;
         return mainCamera.ScreenToWorldPoint(mouseScreenPos);
     }
 }

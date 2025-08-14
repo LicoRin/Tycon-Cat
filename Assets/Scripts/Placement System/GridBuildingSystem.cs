@@ -146,22 +146,21 @@ public class GridBuildingSystem : MonoBehaviour
     public void InitializeWithBuilding(GameObject buildingPrefab)
 {
 
-    // Берем позицию мыши
+   
     Vector3 mousePosition = Input.mousePosition;
-    mousePosition.z = 10f; // расстояние до камеры
+    mousePosition.z = 10f; 
     Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
 
-        // Выравниваем по центру клетки
+       
         Vector3Int cellPosition = gridLayout.WorldToCell(worldPosition);
         Vector3 snappedPosition = gridLayout.CellToWorld(cellPosition)
                                 + 0.5f * gridLayout.cellSize;
 
 
-        // Спавним объект уже в центре клетки
+     
         temp = Instantiate(buildingPrefab, snappedPosition, Quaternion.identity)
                  .GetComponent<Building>();
 
-    // Устанавливаем область в ту же клетку
     temp.area.position = cellPosition;
 
     FollowBuilding();

@@ -22,7 +22,7 @@ public class HomeButton : MonoBehaviour
         _mouseInput = FindObjectOfType<MouseInput>();
         _mouseInput.Clicked += MouseOnClicked;
 
-        // Установим обычный спрайт по умолчанию
+        
         spriteRenderer.sprite = normalSprite;
     }
 
@@ -47,7 +47,7 @@ public class HomeButton : MonoBehaviour
 
     private void OnMouseExit()
     {
-        // Если мышка ушла с объекта до отпускания
+
         spriteRenderer.sprite = normalSprite;
     }
 
